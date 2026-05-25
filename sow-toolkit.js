@@ -1,5 +1,5 @@
 (function() {
-    'use strict';
+        'use strict';
 
         var existing = document.getElementById('sow-toolkit-menu');
         if (existing) {
@@ -11,6 +11,10 @@
         function loadState() { try { return JSON.parse(sessionStorage.getItem(SK)) || {}; } catch(e) { return {}; } }
         function saveState(s) { try { sessionStorage.setItem(SK, JSON.stringify(s)); } catch(e) {} }
         var state = loadState();
+
+        var CURRENT_VERSION = '3.1';
+        var VERSION_URL = 'https://raw.githubusercontent.com/WolfStackSolutions/sow-toolkit/main/version.json';
+        var SCRIPT_URL  = 'https://raw.githubusercontent.com/WolfStackSolutions/sow-toolkit/main/sow-toolkit.js';
 
         function getTabRoot() {
             var m1 = document.querySelector('macroponent-f51912f4c700201072b211d4d8c26010');
@@ -1280,7 +1284,7 @@
         menu.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:999999;background:rgba(10,10,18,0.96);border:1px solid rgba(79,82,189,0.3);border-radius:16px;font-family:"JetBrains Mono","SF Mono",Consolas,monospace;font-size:12px;color:#ccc;width:340px;box-shadow:0 24px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(79,82,189,0.1),0 0 60px rgba(79,82,189,0.08);overflow:hidden;backdrop-filter:blur(20px);';
 
         var hd = document.createElement('div'); hd.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:16px 20px 14px;';
-        hd.innerHTML = '<div style="display:flex;align-items:center;gap:10px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6C6FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg><div><div style="color:#e0e0ea;font-weight:700;font-size:13px;letter-spacing:0.5px;">SOW Toolkit</div></div></div><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:9px;color:#55556e;letter-spacing:1px;padding:3px 8px;background:rgba(79,82,189,0.1);border:1px solid rgba(79,82,189,0.2);border-radius:100px;">v3.0</span><span id="sow-tk-close" style="cursor:pointer;color:#55556e;font-size:16px;transition:color 0.15s;padding:2px 4px;line-height:1;">✕</span></div>';
+        hd.innerHTML = '<div style="display:flex;align-items:center;gap:10px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6C6FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg><div><div style="color:#e0e0ea;font-weight:700;font-size:13px;letter-spacing:0.5px;">SOW Toolkit</div></div></div><div style="display:flex;align-items:center;gap:10px;"><div id="sow-tk-version" style="display:flex;align-items:center;gap:6px;font-size:9px;letter-spacing:0.8px;padding:3px 10px;background:rgba(79,82,189,0.1);border:1px solid rgba(79,82,189,0.2);border-radius:100px;color:#55556e;transition:all 0.3s;cursor:default;"><span id="sow-tk-ver-dot" style="width:5px;height:5px;border-radius:50%;background:#55556e;transition:all 0.3s;flex-shrink:0;"></span><span id="sow-tk-ver-text">checking...</span></div><span id="sow-tk-close" style="cursor:pointer;color:#55556e;font-size:16px;transition:color 0.15s;padding:2px 4px;line-height:1;">✕</span></div>';
         menu.appendChild(hd);
 
         var sep = document.createElement('div'); sep.style.cssText = 'height:1px;background:linear-gradient(90deg,transparent,rgba(79,82,189,0.3),transparent);margin:0 20px;';
@@ -1359,4 +1363,131 @@
         closeEl.addEventListener('mouseenter', function() { closeEl.style.color = '#ef4444'; });
         closeEl.addEventListener('mouseleave', function() { closeEl.style.color = '#55556e'; });
         closeEl.addEventListener('click', function() { menu.style.display = 'none'; });
+
+        // ---- Version Check ----
+        (function checkVersion() {
+            var badge   = document.getElementById('sow-tk-version');
+            var dotEl   = document.getElementById('sow-tk-ver-dot');
+            var textEl  = document.getElementById('sow-tk-ver-text');
+            if (!badge || !textEl || !dotEl) return;
+
+            // Pulse animation for the dot
+            var pulseStyle = document.createElement('style');
+            pulseStyle.id = 'sow-tk-vpulse';
+            if (!document.getElementById('sow-tk-vpulse')) {
+                pulseStyle.textContent = '@keyframes sow-vpulse{0%,100%{opacity:1}50%{opacity:0.35}}';
+                document.head.appendChild(pulseStyle);
+            }
+            dotEl.style.animation = 'sow-vpulse 1s ease-in-out infinite';
+
+            function cmpVer(a, b) {
+                var pa = a.split('.').map(Number);
+                var pb = b.split('.').map(Number);
+                for (var i = 0; i < Math.max(pa.length, pb.length); i++) {
+                    var na = pa[i] || 0, nb = pb[i] || 0;
+                    if (na < nb) return -1;
+                    if (na > nb) return 1;
+                }
+                return 0;
+            }
+
+            function setUpToDate() {
+                dotEl.style.background = '#10b981';
+                dotEl.style.boxShadow = '0 0 6px rgba(16,185,129,0.5)';
+                dotEl.style.animation = 'none';
+                badge.style.borderColor = 'rgba(16,185,129,0.25)';
+                badge.style.background = 'rgba(16,185,129,0.06)';
+                textEl.textContent = 'v' + CURRENT_VERSION;
+                textEl.style.color = '#10b981';
+            }
+
+            function setError() {
+                dotEl.style.animation = 'none';
+                dotEl.style.background = '#55556e';
+                dotEl.style.boxShadow = 'none';
+                textEl.textContent = 'v' + CURRENT_VERSION;
+                textEl.style.color = '#55556e';
+            }
+
+            function setUpdateAvailable(remote) {
+                dotEl.style.background = '#f59e0b';
+                dotEl.style.boxShadow = '0 0 8px rgba(245,158,11,0.6)';
+                dotEl.style.animation = 'sow-vpulse 1.2s ease-in-out infinite';
+                badge.style.borderColor = 'rgba(245,158,11,0.35)';
+                badge.style.background = 'rgba(245,158,11,0.08)';
+                badge.style.cursor = 'pointer';
+                textEl.textContent = 'v' + remote + ' available';
+                textEl.style.color = '#f59e0b';
+                badge.title = 'Click to update to v' + remote;
+
+                var updateHandler = function(e) {
+                    e.stopPropagation();
+                    badge.removeEventListener('click', updateHandler);
+
+                    // Show updating state
+                    dotEl.style.animation = 'sow-vpulse 0.4s ease-in-out infinite';
+                    dotEl.style.background = '#6C6FFF';
+                    dotEl.style.boxShadow = '0 0 8px rgba(108,111,255,0.6)';
+                    textEl.textContent = 'updating...';
+                    textEl.style.color = '#6C6FFF';
+                    badge.style.borderColor = 'rgba(108,111,255,0.35)';
+                    badge.style.background = 'rgba(108,111,255,0.08)';
+                    badge.style.cursor = 'default';
+                    badge.title = '';
+
+                    fetch(SCRIPT_URL + '?t=' + Date.now())
+                        .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+                        .then(function(code) {
+                            // Clean up all active tools
+                            if (window._sowToolkit) {
+                                Object.keys(window._sowToolkit).forEach(function(k) {
+                                    try { if (typeof window._sowToolkit[k] === 'function') window._sowToolkit[k](); } catch(ex) {}
+                                });
+                                window._sowToolkit = {};
+                            }
+                            // Remove current menu
+                            var m = document.getElementById('sow-toolkit-menu');
+                            if (m) m.remove();
+                            // Remove old pulse style
+                            var ps = document.getElementById('sow-tk-vpulse');
+                            if (ps) ps.remove();
+                            // Execute new version
+                            try { (0, eval)(code); } catch(ex) { console.error('SOW Toolkit update eval failed:', ex); }
+                        })
+                        .catch(function(err) {
+                            dotEl.style.background = '#ef4444';
+                            dotEl.style.boxShadow = '0 0 6px rgba(239,68,68,0.5)';
+                            dotEl.style.animation = 'none';
+                            textEl.textContent = 'update failed';
+                            textEl.style.color = '#ef4444';
+                            badge.style.borderColor = 'rgba(239,68,68,0.3)';
+                            badge.style.background = 'rgba(239,68,68,0.06)';
+                            badge.style.cursor = 'default';
+                            badge.title = err.message;
+                            // Revert to showing current version after a few seconds
+                            setTimeout(function() {
+                                setError();
+                                badge.title = '';
+                            }, 4000);
+                        });
+                };
+                badge.addEventListener('click', updateHandler);
+            }
+
+            // Fetch version.json with cache-bust
+            try {
+                fetch(VERSION_URL + '?t=' + Date.now())
+                    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+                    .then(function(data) {
+                        var remote = data.version || data.v || '';
+                        if (!remote) { setUpToDate(); return; }
+                        if (cmpVer(CURRENT_VERSION, remote) < 0) {
+                            setUpdateAvailable(remote);
+                        } else {
+                            setUpToDate();
+                        }
+                    })
+                    .catch(function() { setError(); });
+            } catch(e) { setError(); }
+        })();
 })();
