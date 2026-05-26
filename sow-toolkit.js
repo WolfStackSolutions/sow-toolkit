@@ -13,8 +13,7 @@
         var state = loadState();
 
         var CURRENT_VERSION = '3.1';
-        var VERSION_URL = 'https://raw.githubusercontent.com/WolfStackSolutions/sow-toolkit/main/version.json';
-        var SCRIPT_URL  = 'https://raw.githubusercontent.com/WolfStackSolutions/sow-toolkit/main/sow-toolkit.js';
+        var CDN_BASE = 'https://cdn.jsdelivr.net/gh/WolfStackSolutions/sow-toolkit@main/';
 
         function getTabRoot() {
             var m1 = document.querySelector('macroponent-f51912f4c700201072b211d4d8c26010');
@@ -1364,14 +1363,14 @@
         closeEl.addEventListener('mouseleave', function() { closeEl.style.color = '#55556e'; });
         closeEl.addEventListener('click', function() { menu.style.display = 'none'; });
 
-        // ---- Version Check ----
+
+        // ---- Version Check (script-tag injection to bypass CSP connect-src) ----
         (function checkVersion() {
             var badge   = document.getElementById('sow-tk-version');
             var dotEl   = document.getElementById('sow-tk-ver-dot');
             var textEl  = document.getElementById('sow-tk-ver-text');
             if (!badge || !textEl || !dotEl) return;
 
-            // Pulse animation for the dot
             var pulseStyle = document.createElement('style');
             pulseStyle.id = 'sow-tk-vpulse';
             if (!document.getElementById('sow-tk-vpulse')) {
@@ -1424,7 +1423,6 @@
                     e.stopPropagation();
                     badge.removeEventListener('click', updateHandler);
 
-                    // Show updating state
                     dotEl.style.animation = 'sow-vpulse 0.4s ease-in-out infinite';
                     dotEl.style.background = '#6C6FFF';
                     dotEl.style.boxShadow = '0 0 8px rgba(108,111,255,0.6)';
@@ -1435,59 +1433,56 @@
                     badge.style.cursor = 'default';
                     badge.title = '';
 
-                    fetch(SCRIPT_URL + '?t=' + Date.now())
-                        .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
-                        .then(function(code) {
-                            // Clean up all active tools
-                            if (window._sowToolkit) {
-                                Object.keys(window._sowToolkit).forEach(function(k) {
-                                    try { if (typeof window._sowToolkit[k] === 'function') window._sowToolkit[k](); } catch(ex) {}
-                                });
-                                window._sowToolkit = {};
-                            }
-                            // Remove current menu
-                            var m = document.getElementById('sow-toolkit-menu');
-                            if (m) m.remove();
-                            // Remove old pulse style
-                            var ps = document.getElementById('sow-tk-vpulse');
-                            if (ps) ps.remove();
-                            // Execute new version
-                            try { (0, eval)(code); } catch(ex) { console.error('SOW Toolkit update eval failed:', ex); }
-                        })
-                        .catch(function(err) {
-                            dotEl.style.background = '#ef4444';
-                            dotEl.style.boxShadow = '0 0 6px rgba(239,68,68,0.5)';
-                            dotEl.style.animation = 'none';
-                            textEl.textContent = 'update failed';
-                            textEl.style.color = '#ef4444';
-                            badge.style.borderColor = 'rgba(239,68,68,0.3)';
-                            badge.style.background = 'rgba(239,68,68,0.06)';
-                            badge.style.cursor = 'default';
-                            badge.title = err.message;
-                            // Revert to showing current version after a few seconds
-                            setTimeout(function() {
-                                setError();
-                                badge.title = '';
-                            }, 4000);
+                    // Clean up all active tools before hot-swap
+                    if (window._sowToolkit) {
+                        Object.keys(window._sowToolkit).forEach(function(k) {
+                            try { if (typeof window._sowToolkit[k] === 'function') window._sowToolkit[k](); } catch(ex) {}
                         });
+                        window._sowToolkit = {};
+                    }
+                    var oldMenu = document.getElementById('sow-toolkit-menu');
+                    if (oldMenu) oldMenu.remove();
+                    var ps = document.getElementById('sow-tk-vpulse');
+                    if (ps) ps.remove();
+
+                    // Load new version via script tag
+                    var us = document.createElement('script');
+                    us.src = CDN_BASE + 'sow-toolkit.js?' + Date.now();
+                    us.onload = function() { try { us.remove(); } catch(x) {} };
+                    us.onerror = function() {
+                        try { us.remove(); } catch(x) {}
+                        // Reload the old version so user isn't left with nothing
+                        var rs = document.createElement('script');
+                        rs.src = CDN_BASE + 'sow-toolkit.js';
+                        rs.onload = function() { try { rs.remove(); } catch(x) {} };
+                        rs.onerror = function() { try { rs.remove(); } catch(x) {} };
+                        document.head.appendChild(rs);
+                    };
+                    document.head.appendChild(us);
                 };
                 badge.addEventListener('click', updateHandler);
             }
 
-            // Fetch version.json with cache-bust
+            // Load version.js via script tag (sets window.__SOW_TK_LATEST)
             try {
-                fetch(VERSION_URL + '?t=' + Date.now())
-                    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-                    .then(function(data) {
-                        var remote = data.version || data.v || '';
-                        if (!remote) { setUpToDate(); return; }
-                        if (cmpVer(CURRENT_VERSION, remote) < 0) {
-                            setUpdateAvailable(remote);
-                        } else {
-                            setUpToDate();
-                        }
-                    })
-                    .catch(function() { setError(); });
+                var vs = document.createElement('script');
+                vs.src = CDN_BASE + 'version.js?' + Date.now();
+                vs.onload = function() {
+                    try { vs.remove(); } catch(x) {}
+                    var remote = window.__SOW_TK_LATEST || '';
+                    try { delete window.__SOW_TK_LATEST; } catch(x) {}
+                    if (!remote) { setUpToDate(); return; }
+                    if (cmpVer(CURRENT_VERSION, remote) < 0) {
+                        setUpdateAvailable(remote);
+                    } else {
+                        setUpToDate();
+                    }
+                };
+                vs.onerror = function() {
+                    try { vs.remove(); } catch(x) {}
+                    setError();
+                };
+                document.head.appendChild(vs);
             } catch(e) { setError(); }
         })();
 })();
