@@ -12,7 +12,7 @@
         function saveState(s) { try { sessionStorage.setItem(SK, JSON.stringify(s)); } catch(e) {} }
         var state = loadState();
 
-        var CURRENT_VERSION = '3.1';
+        var CURRENT_VERSION = '4.0';
         var LAST_UPDATED = '26 May 2026';
         var CDN_BASE = 'https://cdn.jsdelivr.net/gh/WolfStackSolutions/sow-toolkit@main/';
 
