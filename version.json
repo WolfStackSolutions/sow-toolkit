@@ -1,4 +1,1 @@
-{
-  "version": "3.2",
-  "changelog": "Added auto-update system, version checking in menu header"
-}
+window.__SOW_TK_LATEST='3.1';
