@@ -13,6 +13,7 @@
         var state = loadState();
 
         var CURRENT_VERSION = '3.1';
+        var LAST_UPDATED = '26 May 2026';
         var CDN_BASE = 'https://cdn.jsdelivr.net/gh/WolfStackSolutions/sow-toolkit@main/';
 
         function getTabRoot() {
@@ -1355,6 +1356,7 @@
         var sep2 = document.createElement('div'); sep2.style.cssText = 'height:1px;background:linear-gradient(90deg,transparent,rgba(79,82,189,0.2),transparent);margin-bottom:10px;';
         footer.appendChild(sep2);
         var hint = document.createElement('div'); hint.style.cssText = 'font-size:10px;color:#333;line-height:1.5;letter-spacing:0.2px;'; hint.textContent = "if a tool doesn't activate, toggle it off and on — SOW is a big app :)"; footer.appendChild(hint);
+        var updated = document.createElement('div'); updated.style.cssText = 'font-size:9px;color:#2a2a3a;letter-spacing:0.5px;margin-top:6px;display:flex;justify-content:space-between;align-items:center;'; updated.innerHTML = '<span>last updated ' + LAST_UPDATED + '</span><span style="color:#1a1a2a;">v' + CURRENT_VERSION + '</span>'; footer.appendChild(updated);
         menu.appendChild(footer);
 
         document.body.appendChild(menu);
