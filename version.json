@@ -1,1 +1,2 @@
-window.__SOW_TK_LATEST='3.2';
+var CURRENT_VERSION = '3.2';
+var LAST_UPDATED = '2 Jun 2026';
