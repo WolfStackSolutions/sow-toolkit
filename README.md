@@ -4,7 +4,7 @@ All notable changes to SOW Assistant Tools are documented here.
 
 Reconstructed from development history. Dates are approximate.
 
-## [5.0] - 2026-07-15
+## [5.0 UNRELEASED] - 2026-07-15
 
 ![The Better Watchlist](images/thebetterwatchlist.png)
 
