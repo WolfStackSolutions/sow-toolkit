@@ -2,6 +2,8 @@
 
 [![Download latest release](https://img.shields.io/badge/Download%20latest%20release-v5.3.1-7d7ae8?style=for-the-badge)](https://github.com/WolfStackSolutions/sow-toolkit/releases/latest/download/sowqoltools_latest.html)
 
+Download the latest version [here](https://github.com/WolfStackSolutions/sow-toolkit/releases/latest/download/sowqoltools_latest.html).
+
 All the updates to SOW Assistant Tools, in plain english.
 
 ## [5.3] - 2026-07-23
