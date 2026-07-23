@@ -4,6 +4,8 @@ All the updates to SOW Assistant Tools, in plain english.
 
 ## [5.3] - 2026-07-23
 
+![SOW Assistant Tools v5.3 menu](images/5_3.png)
+
 - Figured out why SOW tabs are so slow: the workspace only keeps 3 tabs actually loaded (ServiceNow's own default is 10), so everything else gets torn down and takes 5 seconds to rebuild when you click back.
 - Two new toggles fix it: "Extend Max Tab Limit" lets you raise the 10 tab cap to whatever you want (default 16), and "Tab Cache Persist Bypass" keeps your tabs loaded so switching is instant.
 - New live monitor panel (little chart button in the menu) shows memory use, how many tabs are actually loaded, and whether the fix is holding.
