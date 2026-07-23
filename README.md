@@ -1,4 +1,4 @@
-# Changelog
+ # Changelog
 
 [![Download latest release](https://img.shields.io/badge/Download%20latest%20release-v5.3.1-7d7ae8?style=for-the-badge)](https://github.com/WolfStackSolutions/sow-toolkit/releases/latest/download/sowqoltools_latest.html)
 
@@ -20,8 +20,6 @@ All the updates to SOW Assistant Tools.
 
 - New tool: The Better Watchlist, which watches your tickets and pops a toast when someone changes them, comments, resolves, or reopens, even after close.
 - It stays fast by only asking the server "what changed since last time" instead of re-downloading everything, and uses ServiceNow's own push channel so most updates arrive instantly.
-- Alert Suppressor got rewritten to stop popup alerts from ever being created instead of dismissing them after the fact, with a log of everything it blocked.
-- Performance Boost reworked to block a broken request SOW spams every 6 seconds and to kill page animations.
 - The menu and installer page were restyled to match the new dark panel look, with an animated border and per tool colour stripes.
 
 ## [4.0.1] - 2026-07-03
@@ -41,7 +39,7 @@ All the updates to SOW Assistant Tools.
 ## [3.5] - 2026-06-24
 
 - New tool: Caller Insight, which shows the caller's full profile and their recent tickets right on the contact card.
-- Includes VIP, locked out, and failed login badges, plus click to copy ticket numbers.
+- Includes VIP, locked out plus click to copy ticket numbers.
 - Light and dark theme system added, with a main toggle and per tool overrides.
 - Various small colour and date formatting fixes.
 
