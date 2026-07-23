@@ -4,7 +4,7 @@
 
 Download the latest version [here](https://github.com/WolfStackSolutions/sow-toolkit/releases/latest/download/sowqoltools_latest.html).
 
-All the updates to SOW Assistant Tools, in plain english.
+All the updates to SOW Assistant Tools.
 
 ## [5.3] - 2026-07-23
 
